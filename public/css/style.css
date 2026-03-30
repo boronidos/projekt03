@@ -19,6 +19,13 @@ main {
     border: black 7px solid;
 }
 
+form {
+    
+    display: flex;
+    justify-content: stretch;
+    flex-direction: column;
+}
+
 input, select {
     border: 1px solid black;
     padding: 1vh;
@@ -56,6 +63,23 @@ li {
 
 li li {
     font-weight: 400;
+}
+
+label {
+    font-size: 1vw;
+    text-align: left;
+    margin-left: 0.5vw;
+}
+
+input {
+    width: 15vw;
+    height: 1vw;
+
+    border: 2px solid black;
+    border-radius: 0.5vw;
+    padding: 0.5vw;
+    margin-bottom: 1vw;
+    background-color: rgb(250, 240, 249);
 }
 
 .save-display {

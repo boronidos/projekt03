@@ -36,13 +36,13 @@ export function addSave(saveId, data) {
 
   if (!existing) {
     db.runData(
-      "INSERT INTO saves (id, name, difficulty, progress, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)",
-      [saveId, name, difficulty, progress, now, now]
+      "INSERT INTO saves (name, difficulty, progress, created_at, updated_at) VALUES (?, ?, ?, ?, ?)",
+      [name, difficulty, progress, now, now]
     );
   } else {
     db.runData(
-      "UPDATE saves SET difficulty = ?, progress = ?, updated_at = ? WHERE id = ?",
-      [difficulty, progress, now, saveId]
+      "UPDATE saves SET difficulty = ?, progress = ?, updated_at = ? WHERE name = ?",
+      [difficulty, progress, now, name]
     );
   }
 }

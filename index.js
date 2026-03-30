@@ -1,5 +1,7 @@
 import express from "express";
 import saves from "./models/saves.js";
+import accounts from "./models/accounts.js";
+import session from "express-session";
 
 const port = 8000;
 
@@ -8,20 +10,31 @@ const app = express();
 app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: true }));
 
+app.use(
+  session({
+    secret: "secret",
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      maxAge: 1000 * 60 * 60 * 24 
+    }
+  })
+);
+
 app.get("/", (req, res) => {
   res.render("index", { title: "Home" });
 });
 
 app.use(express.static("public"));
 
-app.get("/saves/", (req, res) => {
+app.get("/saves/", accounts.requireLogin, (req, res) => {
   res.render("saves", {
     title: "Load Save",
     saves: saves.getSaveSummaries(),
   });
 });
 
-app.get("/new_save/", (req, res) => {
+app.get("/new_save/", accounts.requireLogin, (req, res) => {
   res.render("new_save", {
     title: "Create New Save",
   });
@@ -34,6 +47,18 @@ app.get("/saves/:id/", (req, res) => {
     return res.status(404).render("save", { id: saveId, save: null, title: "save not found" });
   }
   res.render("save", { id: saveId, save: save, title: `save ${saveId}` });
+});
+
+app.get("/register/", (req, res) => {
+  res.render("register", {
+    title: "Register",
+  });
+});
+
+app.get("/login/", (req, res) => {
+  res.render("login", {
+    title: "Login",
+  });
 });
 
 function handleNewSave(req, res) {
@@ -75,6 +100,55 @@ app.post("/saves/:id/delete", (req, res) => {
   saves.deleteSave(id);
   res.redirect("/saves/");
 });
+
+app.post("/register", (req, res) => {
+  const { login, password } = req.body;
+
+  if (!login || !password) {
+    return res.status(400).send("Login and password required");
+  }
+
+  const ans = accounts.registerAccount(login, password);
+
+  if (ans !== false) {
+    req.session.user_id = ans;
+
+    req.session.save(() => {
+      res.redirect("/");
+    });
+  } else {
+    res.status(400).send("User already exists");
+  }
+});
+
+app.get("/test", (req, res) => {
+  res.send(`Logged in user: ${req.session.user_id}`);
+});
+
+app.post("/login", (req, res) => {
+  const { login, password } = req.body;
+
+  const id = accounts.loginAccount(login, password);
+  console.log("Login result:", id);
+
+  if (!id) {
+    return res.status(401).send("Invalid login");
+  }
+
+  req.session.user_id = id;
+
+  res.redirect("/new_save/");
+});
+
+app.post(["/logout", "/logout/"], (req, res) => {
+    if (!req.session) return res.status(200).json({ ok: true });
+    req.session.destroy((err) => {
+      if (err) return res.status(500).json({ ok: false, error: "Could not destroy session" });
+      // clear session cookie
+      res.clearCookie("connect.sid");
+      return res.status(200).json({ ok: true });
+    });
+  });
 
 app.listen(port, () => {
   console.log(`Server listening on http://localhost:${port}`);

@@ -12,12 +12,18 @@ const db = new DatabaseSync(dbPath);
 
 db.exec(`
   CREATE TABLE IF NOT EXISTS saves (
-    id TEXT PRIMARY KEY,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT,
     difficulty TEXT,
     progress TEXT,
     created_at TEXT,
     updated_at TEXT
+  );
+
+  CREATE TABLE IF NOT EXISTS accounts (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    login TEXT NOT NULL UNIQUE,
+    password TEXT NOT NULL
   );
 `);
 
@@ -25,13 +31,13 @@ const countRow = db.prepare("SELECT COUNT(*) as c FROM saves").get();
 if (countRow && countRow.c === 0) {
   const now = new Date().toISOString();
 
-  db.prepare(
+  /*db.prepare(
     "INSERT INTO saves (id, name, difficulty, progress, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)"
   ).run("save-01", "save-01", "hard", "74%", now, now);
 
   db.prepare(
     "INSERT INTO saves (id, name, difficulty, progress, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)"
-  ).run("save-02", "save-02", "medium", "36%", now, now);
+  ).run("save-02", "save-02", "medium", "36%", now, now);*/
 }
 
 export function getAllData(sql, params = []) {
