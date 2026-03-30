@@ -107,6 +107,20 @@ input {
     cursor: pointer;
 }
 
+.home-button img{
+    transition: ease-in 100ms;
+    position: fixed;
+
+    top: 1vw;
+    right: 1vw;
+    width: 3vw;
+    height: 3vw;
+}
+
+.home-button img:hover {
+    transform: scale(0.95);
+    cursor: pointer;
+}
 
 .redhead img{
     position: fixed;

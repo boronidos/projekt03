@@ -13,11 +13,12 @@ const db = new DatabaseSync(dbPath);
 db.exec(`
   CREATE TABLE IF NOT EXISTS saves (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT,
-    difficulty TEXT,
-    progress TEXT,
-    created_at TEXT,
-    updated_at TEXT
+    user_id INTEGER NOT NULL,
+    name TEXT NOT NULL,
+    difficulty TEXT NOT NULL,
+    progress TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
   );
 
   CREATE TABLE IF NOT EXISTS accounts (

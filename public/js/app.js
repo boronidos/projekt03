@@ -1,6 +1,7 @@
 (function () {
     document.addEventListener("DOMContentLoaded", function () {
         const back = document.querySelector(".back-button");
+        const home = document.querySelector(".home-button");
 
         const load = document.querySelector(".load-button");
         const play = document.querySelector(".play-button");
@@ -17,9 +18,18 @@
             else window.location.href = "/";
         }
 
+        function goHome() {
+            window.location.href = "/";
+        }
+
+        home.addEventListener("click", function (e) {
+            goHome();
+        });
+
         back.addEventListener("click", function (e) {
             goBack();
         });
+
 
         if (play && load && logout) {
             play.addEventListener("click", function (e) {

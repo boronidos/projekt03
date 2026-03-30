@@ -1,8 +1,10 @@
 import db from "./db.js";
+import * as bcrypt from "bcrypt"; 
 
-export function registerAccount(login, password) {
+export async function registerAccount(login, password) {
+  const hashedPassword = await bcrypt.hash(password, 10);
 
-  if (login == "admin" && password == "admin") {
+  if (login == "admin" && await bcrypt.compare("admin", hashedPassword)) {
     return false; // cant register admin
   }
 
@@ -14,7 +16,7 @@ export function registerAccount(login, password) {
   if (!existing) {
     db.runData(
       "INSERT INTO accounts (login, password) VALUES (?, ?)",
-      [login, password]
+      [login, hashedPassword]
     );
 
     const user = db.getData(
@@ -28,20 +30,23 @@ export function registerAccount(login, password) {
   return false;
 }
 
-export function loginAccount(login, password) {
+export async function loginAccount(login, password) {
+  const hashedPassword = await bcrypt.hash(password, 10);
 
-  if (login == "admin" && password == "admin") {
+  if (login == "admin" && await bcrypt.compare("admin", hashedPassword)) {
     return -1; // Admin user id is -1
   }
 
   const user = db.getData(
-    "SELECT * FROM accounts WHERE login = ? AND password = ?",
-    [login, password]
+    "SELECT * FROM accounts WHERE login = ?",
+    [login]
   );
 
   console.log("DB result:", user);
 
-  if (user) return user.id;
+  if (user && await bcrypt.compare(password, user.password)) {
+    return user.id;
+  }
   return false;
 }
 
